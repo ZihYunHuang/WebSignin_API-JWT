@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model ShiftArrangementTable {
+  TeamGroup String @db.NChar(1)
+  WorkDate  String @id(map: "PK_ShiftArrangementTable_1") @db.NChar(10)
+}
+
+model Signin {
+  EmployeeID   String @db.NChar(5)
+  EmployeeName String @db.NVarChar(20)
+  LoginDay     String @db.NChar(10)
+  LoginTime    String @db.NChar(8)
+  SignDay      String @db.NChar(10)
+  SignTime     String @db.NChar(8)
+  SignStatus   String @db.NChar(4)
+  SignIP       String @db.NVarChar(20)
+  UserAgent    String @db.NVarChar(200)
+
+  @@id([EmployeeID, SignDay, SignTime], map: "Signin_PK")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model Signin_old {
+  EmployeeID   String  @db.NChar(5)
+  EmployeeName String  @db.NVarChar(20)
+  LoginDay     String  @db.NChar(10)
+  LoginTime    String  @db.NChar(8)
+  SignTime     String  @db.NChar(8)
+  SignStatus   String  @db.NChar(4)
+  SignIP       String  @db.NVarChar(20)
+  UserAgent    String  @db.NVarChar(200)
+  SignDay      String? @db.NChar(10)
+
+  @@index([EmployeeID, SignDay, SignTime, SignStatus], map: "IX_Signin01")
+  @@index([EmployeeID, EmployeeName, LoginDay, LoginTime, SignIP, SignStatus, SignTime, UserAgent, SignDay], map: "IX_Signin02")
+  @@ignore
+}
+
+model Users {
+  EmployeeID   String  @id(map: "PK_Users") @db.NChar(5)
+  EmployeeName String  @db.NVarChar(20)
+  TeamGroup    String  @db.NChar(1)
+  Active       Int?    @default(0, map: "DF_Users_Active") @db.SmallInt
+  Token        String? @default("", map: "DF_Users_Token") @db.NVarChar(300)
+}
